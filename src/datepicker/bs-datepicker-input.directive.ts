@@ -30,7 +30,8 @@ const BS_DATEPICKER_VALIDATOR = {
   host: {
     '(change)': 'onChange($event)',
     '(keyup.esc)': 'hide()',
-    '(blur)': 'onBlur()'
+    '(blur)': 'onBlur()',
+    '(keyup)': 'onKeyup($event)'
   },
   providers: [BS_DATEPICKER_VALUE_ACCESSOR, BS_DATEPICKER_VALIDATOR]
 })
@@ -68,6 +69,29 @@ export class BsDatepickerInputDirective
       : formatDate(value, this._picker._config.dateInputFormat, this._localeService.currentLocale);
 
     this._renderer.setProperty(this._elRef.nativeElement, 'value', initialDate);
+  }
+
+
+
+  doFormat(target: any)
+  {
+    var format = "mm/dd/yyyy";
+    var match = new RegExp(format
+        .replace(/(\w+)\W(\w+)\W(\w+)/, "^\\s*($1)\\W*($2)?\\W*($3)?([0-9]*).*")
+        .replace(/m|d|y/g, "\\d"));
+    var replace = "$1/$2/$3$4"
+        .replace(/\//g, (): any => { return format.match(/\W/)});
+    target.value = target.value
+        .replace(/(^|\W)(?=\d\W)/g, "$10")   // padding
+        .replace(match, replace)             // fields
+        .replace(/(\W)+/g, "$1");            // remove repeats
+    if(target.value.length > 10){
+      target.value = target.value.substring(0, 10);
+    }
+  }
+
+  onKeyup(event: any) {
+    this.doFormat(event.target);
   }
 
   onChange(event: any) {

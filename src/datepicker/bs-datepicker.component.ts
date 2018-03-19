@@ -88,6 +88,8 @@ export class BsDatepickerDirective implements OnInit, OnDestroy, OnChanges {
    * Maximum date which is available for selection
    */
   @Input() maxDate: Date;
+
+  @Input() autoPopupPicker: boolean;
   /**
    * Emits when datepicker value has been changed
    */
@@ -115,11 +117,17 @@ export class BsDatepickerDirective implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): any {
-    this._datepicker.listen({
-      outsideClick: this.outsideClick,
-      triggers: this.triggers,
-      show: () => this.show()
-    });
+    if(this.autoPopupPicker) {
+      this._datepicker.listen({
+        outsideClick: this.outsideClick,
+        triggers: this.triggers,
+        show: () => this.show()
+      });  
+    } else {
+      this._datepicker.listen({
+        outsideClick: this.outsideClick
+      });
+    }
     this.setConfig();
   }
 
